@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 // Mocked data storage
-const mockedFormData = [];
+const mockedFormData: z.infer<typeof signupUserZod>[] = [];
 
 // Zod validation schema
 const signupUserZod = z.object({
@@ -65,10 +65,17 @@ export default function SignupForm({
       setLoading(true);
       await new Promise((resolve) => {
         setTimeout(resolve, 2000);
-        console.log("Pre toast console log");
-        toast.success("Working");
-        console.log("Post toast console log");
       });
+      // Toast was not working because there was not toast provided in the root layout
+      toast.success("Working");
+
+      // Push data to (BE later) mockedFormData
+      console.log("Pushing data to mockedFormData", values);
+      mockedFormData.push(values);
+      console.log("MockedFormData", mockedFormData);
+
+      // Reset form
+      SignupUserForm.reset();
     } catch {
       toast.error("Something went wrong");
     } finally {
