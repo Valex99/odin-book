@@ -11,7 +11,7 @@ export default function Home({ children }: { children: React.ReactNode }) {
 
       {/* <Button>Hey</Button> */}
       {children}
-      <SignupPage />
+      {/* <SignupPage /> */}
     </div>
   );
 }

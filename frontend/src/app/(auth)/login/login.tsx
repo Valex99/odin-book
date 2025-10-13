@@ -1,49 +1,37 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormMessage,
+  FormLabel,
 } from "@/components/ui/form";
-import { buttonVariants } from "@/components/ui/button";
-import { Icons } from "@/components/icons";
-import { InputPassword } from "@/components/ui/input-password";
-import { logIn } from "../actions";
-import { useMounted } from "@/hooks/use-mounted";
-import { useParams, useSearchParams } from "next/navigation";
-import { useVoucherRouter } from "@/hooks/use-voucher-router";
-import { useTranslation } from "@/i18n/client";
-import { LocaleTypes } from "@/i18n/settings";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import Link from "@/components/ui/linkIntl";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
-interface LoginFormProps extends React.HTMLAttributes<HTMLDivElement> {}
+// Mocked data storage
+const mockedFormData: z.infer<typeof loginUserZod>[] = [];
 
+// Zod validation schema
 const loginUserZod = z.object({
-  email: z.string().email({ message: "Email address is not valid!" }),
-  password: z.string().min(3, { message: "Password is required!" }),
+  email: z.email(),
+  password: z.string().min(6, "Password must be at least 6 characters long"),
 });
 
-export default function LoginForm({ className, ...props }: LoginFormProps) {
-  const params = useParams<{ locale: LocaleTypes }>();
-  const { t } = useTranslation(params.locale, "common");
+export default function LoginForm({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  const [loading, setLoading] = useState(false);
 
-  const searchParams = useSearchParams();
-  const callback = searchParams.get("callback");
-
-  const [loading, setLoading] = useState<boolean>(false);
-  const router = useVoucherRouter();
-
+  // Initialize form
   const loginUserForm = useForm<z.infer<typeof loginUserZod>>({
     resolver: zodResolver(loginUserZod),
     defaultValues: {
@@ -52,116 +40,78 @@ export default function LoginForm({ className, ...props }: LoginFormProps) {
     },
   });
 
-  async function credentialLogin(values: z.infer<typeof loginUserZod>) {
-    setLoading(true);
+  // Mock form with try catch
+  async function onSubmit(values: z.infer<typeof loginUserZod>) {
+    try {
+      setLoading(true);
+      await new Promise((resolve) => {
+        setTimeout(resolve, 2000);
+      });
+      toast.success("Working");
 
-    const signInResult = await logIn(
-      values.email,
-      values.password,
-      params.locale
-    );
-    // console.log('🚀 ~ credentialLogin ~ signInResult:', signInResult)
+      // Push data to (BE later) mockedFormData
+      console.log("Pushing data to mockedFormData", values);
+      mockedFormData.push(values);
+      console.log("MockedFormData", mockedFormData);
 
-    if (signInResult.ok) {
-      toast.success(t("auth.login.toast.success"));
-      router.push(callback || "/");
-    } else {
-      toast.error(signInResult.error);
+      // Reset form
+      loginUserForm.reset();
+    } catch {
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
-  const mounted = useMounted();
-  if (!mounted) return null;
-
   return (
-    <div className={cn("", className)} {...props}>
+    <div className={cn("max-w-[500px]", className)} {...props}>
       <Form {...loginUserForm}>
-        <form onSubmit={loginUserForm.handleSubmit(credentialLogin)}>
-          <div className="mt-8 flex flex-col gap-y-4">
+        <form onSubmit={loginUserForm.handleSubmit(onSubmit)}>
+          {/* Div for styling */}
+          <div className="width-[400px] space-y-4 rounded-md border p-4">
+            {/* EMAIL */}
             <FormField
               control={loginUserForm.control}
               name="email"
               render={({ field }) => (
                 <FormItem className="">
-                  <div className="flex w-full flex-col gap-y-1">
-                    <Label
-                      className="text-left text-xs text-[#74676F]"
-                      htmlFor="email"
-                    >
-                      {t("auth.login.email")} *
-                    </Label>
-                    <FormControl>
-                      <Input
-                        className={""}
-                        autoCapitalize="none"
-                        autoComplete="off"
-                        role="presentation"
-                        disabled={loading}
-                        placeholder="Enter..."
-                        {...field}
-                      />
-                    </FormControl>
-                  </div>
-                  <div className="min-w-fit">
-                    <FormMessage />
-                  </div>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="bg-transparent"
+                      autoComplete="off"
+                      disabled={loading}
+                      placeholder="Email"
+                      type="email"
+                      {...field}
+                    ></Input>
+                  </FormControl>
                 </FormItem>
               )}
-            />
+            ></FormField>
+
+            {/* PASSWORD */}
             <FormField
               control={loginUserForm.control}
               name="password"
               render={({ field }) => (
                 <FormItem className="">
-                  <div className="flex w-full flex-col gap-y-1">
-                    <Label
-                      className="text-left text-xs text-[#74676F]"
-                      htmlFor="email"
-                    >
-                      {t("auth.login.password")} *
-                    </Label>
-                    <FormControl>
-                      <InputPassword
-                        className=""
-                        id="password"
-                        placeholder="Password"
-                        type="password"
-                        autoCapitalize="none"
-                        autoComplete="password"
-                        autoCorrect="off"
-                        disabled={loading}
-                        onKeyDown={(e: { key: string }) => {
-                          if (e.key === "enter")
-                            loginUserForm.handleSubmit(credentialLogin);
-                        }}
-                        {...field}
-                      />
-                    </FormControl>
-                  </div>
-                  <div className="min-w-fit">
-                    <FormMessage />
-                  </div>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="bg-transparent"
+                      autoComplete="off"
+                      disabled={loading}
+                      placeholder="Password"
+                      type="password"
+                      {...field}
+                    ></Input>
+                  </FormControl>
                 </FormItem>
               )}
-            />
-            <div className="-mt-6">
-              <Link
-                href="/forgot-password"
-                className={cn(buttonVariants({ variant: "link" }), "m-0 p-0")}
-              >
-                {t("auth.login.forgotPassword")}
-              </Link>
-            </div>
-            <Button
-              className="rounded-1 mt-8 bg-primary p-7"
-              disabled={loading}
-            >
-              {t("auth.login.signin")}
-              {loading && (
-                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-              )}
+            ></FormField>
+            <Button type="submit" disabled={loading} className="cursor-pointer">
+              Submit
             </Button>
           </div>
         </form>
