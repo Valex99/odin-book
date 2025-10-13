@@ -6,6 +6,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -86,6 +87,7 @@ export default function LoginForm({
                       {...field}
                     ></Input>
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             ></FormField>
@@ -107,6 +109,7 @@ export default function LoginForm({
                       {...field}
                     ></Input>
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             ></FormField>

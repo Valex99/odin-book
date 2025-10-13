@@ -1,0 +1,2 @@
+When zod fails there is an onError (it console logs error, why zod fails?) -> https://l.messenger.com/l.php?u=https%3A%2F%2Freact-hook-form.com%2Fdocs%2Fuseform%2Fhandlesubmit&h=AT0XCg3rzE4Mpm8EMYOnC15yDBND1N9OXKMLeD544J6SVGeLemIY4Y7Rs1DspjXjQmSfMdg9EbjrUjw5E6Bd_HPDpBY5lo6jwo-d1Frk4quMnQw83WnQzHO1CM-4m02Y4sYPz8_6h64
+
