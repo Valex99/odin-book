@@ -113,7 +113,11 @@ export default function LoginForm({
                 </FormItem>
               )}
             ></FormField>
-            <Button type="submit" disabled={loading} className="cursor-pointer">
+            <Button
+              type="submit"
+              disabled={loading}
+              className="cursor-pointer border-black rounded-md"
+            >
               Submit
             </Button>
           </div>

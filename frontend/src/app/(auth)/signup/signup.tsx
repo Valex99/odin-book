@@ -104,7 +104,13 @@ export default function SignupForm({
   };
 
   return (
-    <div className={cn("max-w-[500px]", className)} {...props}>
+    <div
+      className={cn(
+        "max-w-[500px] bg-white text-black borrder-black rounded-md",
+        className
+      )}
+      {...props}
+    >
       <Form {...SignupUserForm}>
         <form onSubmit={SignupUserForm.handleSubmit(onSubmit)}>
           {/* Div for styling */}
@@ -238,7 +244,11 @@ export default function SignupForm({
               )}
             ></FormField>
 
-            <Button type="submit" disabled={loading} className="cursor-pointer">
+            <Button
+              type="submit"
+              disabled={loading}
+              className="cursor-pointer border-black rounded-md"
+            >
               Submit
             </Button>
           </div>
