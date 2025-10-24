@@ -22,3 +22,17 @@ export const checkEmailAvailability = async (email: string) => {
     select: { id: true },
   });
 };
+
+export const createUser = async (
+  username: string,
+  email: string,
+  password: string
+) => {
+  return await prisma.user.create({
+    data: {
+      username: username,
+      email: email,
+      password: password,
+    },
+  });
+};
