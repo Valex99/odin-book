@@ -1,21 +1,14 @@
-// Code according to YT video: https://youtu.be/5Vxx5UkjV4s?si=nNf1d-QTLMIVNxFS
+import express from "express";
+import authRoutes from "./routes/authRoutes.js";
 
-// const express = require("express");
-// const app = express;
-// const PORT = 8080;
+const app = express();
 
-// create actuall api route where you will be fetching the data from
-// app.get("/api/home", (req, res) => {
-//   res.json({ message: "Hello world!" });
-// });
+app.use("/auth", authRoutes);
 
-// To run out app
-// app.listen(PORT, () => {
-//     console.log(`Server is running on port: ${PORT}`);
-// })
+app.get("/", (req, res) => {
+  res.send("Hello World");
+});
 
-// Install nodemon
-// Look in package.json HOW to start your server
-
-
-// First create a form:
+app.listen(3000, () => {
+  console.log("Server is running on port 3000");
+});
