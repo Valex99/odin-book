@@ -15,11 +15,10 @@ datasource db {
 }
 
 model User {
-  id              Int    @id @default(autoincrement())
-  username        String @unique
-  email           String @unique
-  password        String
-  confirmPassword String
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  email    String @unique
+  password String
 }
 
 // Create models for everything (from messages to likes to everything)
