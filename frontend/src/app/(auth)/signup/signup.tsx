@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { handleSignupUser } from "./actions";
 
 // Mocked data storage
 const mockedFormData: z.infer<typeof signupUserZod>[] = [];
@@ -73,24 +74,22 @@ export default function SignupForm({
     },
   });
 
-  // Mock form with try catch
+  // Handle form submission
   async function onSubmit(values: z.infer<typeof signupUserZod>) {
     try {
       setLoading(true);
-      await new Promise((resolve) => {
-        setTimeout(resolve, 2000);
-      });
-      // Toast was not working because there was not toast provided in the root layout
-      toast.success("Working");
 
-      // Push data to (BE later) mockedFormData
-      console.log("Pushing data to mockedFormData", values);
-      mockedFormData.push(values);
-      console.log("MockedFormData", mockedFormData);
+      // Call the server action to sign up user
+      const result = await handleSignupUser(values);
 
-      // Reset form
-      SignupUserForm.reset();
-    } catch {
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success(result.message || "User created successfully!");
+        SignupUserForm.reset();
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
       toast.error("Something went wrong");
     } finally {
       setLoading(false);
