@@ -36,3 +36,11 @@ export const createUser = async (
     },
   });
 };
+
+// LOGIN SERVICE
+// Get user from DB (based on email)
+export const getUserFromDb = async (email: string) => {
+  return await prisma.user.findUnique({
+    where: { email: email },
+  });
+};

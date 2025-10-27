@@ -5,6 +5,7 @@ import {
   checkUsernameAvailability,
   checkEmailAvailability,
   createUser,
+  getUserFromDb,
 } from "../services/authServices";
 
 import { Request, Response, NextFunction } from "express";
@@ -12,7 +13,7 @@ import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcrypt";
 const SALT_ROUNDS = 10; // Typically a value between 10 and 12
 
-const signupController = async (
+export const signupController = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -67,4 +68,51 @@ const signupController = async (
   }
 };
 
-export default signupController;
+export const loginController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { email, password } = req.body;
+
+  try {
+    const userFromDb = await getUserFromDb(email);
+
+    // If email does not exist, throw an error and send back to client
+    if (!userFromDb) {
+      throw new Error("Email does not exist");
+    }
+
+    // Hash password first
+    const isPasswordValid = await bcrypt.compare(password, userFromDb.password);
+
+    if (!isPasswordValid) {
+      throw new Error("Invalid password");
+    }
+
+    // Redirect to / page
+    return (
+      res
+        .status(200)
+        // return user object to client without password
+        .json({
+          message: "Login successful",
+          user: {
+            id: userFromDb.id,
+            username: userFromDb.username,
+            email: userFromDb.email,
+          },
+        })
+        .redirect("/")
+    );
+
+    // Send feedback to client
+    // Show toast message
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    return res
+      .status(400)
+      .json({ message: "Login failed", error: errorMessage });
+  }
+};
