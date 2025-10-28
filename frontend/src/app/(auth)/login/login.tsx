@@ -16,9 +16,11 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { handleLoginUser } from "./actions";
+import { useRouter } from "next/navigation";
 
 // Mocked data storage
-const mockedFormData: z.infer<typeof loginUserZod>[] = [];
+//const mockedFormData: z.infer<typeof loginUserZod>[] = [];
 
 // Zod validation schema
 const loginUserZod = z.object({
@@ -30,6 +32,9 @@ export default function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  // Hooks can only be called in the body of a functional component
+  const router = useRouter();
+
   const [loading, setLoading] = useState(false);
 
   // Initialize form
@@ -41,22 +46,23 @@ export default function LoginForm({
     },
   });
 
-  // Mock form with try catch
+  // Handle form submission
   async function onSubmit(values: z.infer<typeof loginUserZod>) {
     try {
       setLoading(true);
-      await new Promise((resolve) => {
-        setTimeout(resolve, 2000);
-      });
-      toast.success("Working");
 
-      // Push data to (BE later) mockedFormData
-      console.log("Pushing data to mockedFormData", values);
-      mockedFormData.push(values);
-      console.log("MockedFormData", mockedFormData);
+      // Call the server action to login user (Call to the backend)
+      const result = await handleLoginUser(values);
 
-      // Reset form
-      loginUserForm.reset();
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success(result.message || "Login successful!");
+        loginUserForm.reset();
+
+        // Redirect user to home page
+        router.push("/");
+      }
     } catch {
       toast.error("Something went wrong");
     } finally {
