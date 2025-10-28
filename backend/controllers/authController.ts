@@ -103,7 +103,6 @@ export const loginController = async (
             email: userFromDb.email,
           },
         })
-        .redirect("/")
     );
 
     // Send feedback to client
