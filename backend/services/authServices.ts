@@ -2,6 +2,7 @@
 
 // Function to create user
 import { PrismaClient } from "../generated/prisma";
+import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
 
@@ -44,3 +45,10 @@ export const getUserFromDb = async (email: string) => {
     where: { email: email },
   });
 };
+
+// Generate JWT
+export function generateAccessToken(username: string) {
+  return jwt.sign({ username: username }, process.env.TOKEN_SECRET as string, {
+    expiresIn: "15m",
+  });
+}

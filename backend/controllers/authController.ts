@@ -7,8 +7,8 @@ import {
   createUser,
   getUserFromDb,
 } from "../services/authServices";
-
 import { Request, Response, NextFunction } from "express";
+import { generateAccessToken } from "../services/authServices";
 
 import bcrypt from "bcrypt";
 const SALT_ROUNDS = 10; // Typically a value between 10 and 12
@@ -53,9 +53,10 @@ export const signupController = async (
     const newUser = await createUser(username, email, bcryptPassword);
 
     // Send result back to client
-    return res
-      .status(201)
-      .json({ message: "User created successfully", user: newUser });
+    return res.status(201).json({
+      message: "User created successfully",
+      user: newUser,
+    });
   } catch (error) {
     // return res
     //   .status(400)
@@ -90,17 +91,36 @@ export const loginController = async (
       throw new Error("Invalid password");
     }
 
+    // Generate JWT (after verifying email and password)
+    // Later generate token at sign in as well
+    const token = generateAccessToken(userFromDb.username);
+
     // Redirect to / page
     return (
       res
         .status(200)
         // return user object to client without password
+        // COOKIE HAS TO BE SET ON THE FRONTEND
+        // .cookie("token", token, {
+        //   httpOnly: true,
+        //   secure: process.env.NODE_ENV === "production",
+        //   maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        //   sameSite: "lax",
+        //   path: "/",
+        // })
+
+        // Send JWT, not cookie
+
+        // Set JWT as an HTTP-only cookie (set it up in login controller after you verify credentials)
+
         .json({
           message: "Login successful",
           user: {
             id: userFromDb.id,
             username: userFromDb.username,
             email: userFromDb.email,
+            token: token,
+            accessToken: token,
           },
         })
     );
